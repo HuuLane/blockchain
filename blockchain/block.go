@@ -9,6 +9,7 @@ type Block struct {
 	PrevHash []byte
 	Data     []byte
 	Hash     []byte
+	Nonce    int
 }
 
 func (b *Block) DeriveHash() {
@@ -19,8 +20,13 @@ func (b *Block) DeriveHash() {
 }
 
 func NewBlock(prevHash []byte, data string) *Block {
-	b := &Block{prevHash, []byte(data), nil}
-	b.DeriveHash()
+	b := &Block{prevHash, []byte(data), nil, 0}
+	pow := NewProofOfWork(b)
+	nonce, hash := pow.Run()
+
+	b.Nonce = nonce
+	b.Hash = hash
+
 	return b
 }
 
