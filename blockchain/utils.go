@@ -9,7 +9,7 @@ import (
 
 func New32BytesArrWithRsh(n int) *[32]byte {
 	if n < 1 || n > 32 {
-		return nil
+		panic("shift out of bounds")
 	}
 	var res [32]byte
 
