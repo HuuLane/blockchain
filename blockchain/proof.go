@@ -66,6 +66,6 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 
 func (pow *ProofOfWork) Validate() bool {
 	data := pow.ToBytesWithNonce(pow.Block.Nonce)
-	hash := sha256.Sum256(data)
-	return Cmp32BytesArr(&hash, pow.Target) == -1
+	checksum := sha256.Sum256(data)
+	return Cmp32BytesArr(&checksum, pow.Target) == -1
 }

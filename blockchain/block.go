@@ -10,10 +10,10 @@ type Block struct {
 func NewBlock(prevHash []byte, data string) *Block {
 	b := &Block{prevHash, []byte(data), nil, 0}
 	pow := NewProofOfWork(b)
-	nonce, hash := pow.Run()
+	nonce, checksum := pow.Run()
 
 	b.Nonce = nonce
-	b.Hash = hash
+	b.Hash = checksum
 
 	return b
 }
