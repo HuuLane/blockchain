@@ -3,11 +3,8 @@ package blockchain
 import (
 	"bytes"
 	"crypto/sha256"
-	"encoding/binary"
 	"fmt"
-	"log"
 	"math"
-	"math/big"
 )
 
 // Take the data from the block
@@ -16,72 +13,59 @@ import (
 // check the hash to see if it meets a set of requirements
 // Requirements:
 // The First few bytes must contain 0s
+//
+// choose Sum256 means using [32]byte
+// to store the checksum result is perfect
+// 32 * 8 = 256
 
-const Difficulty = 12
+// must >= 1
+const Difficulty = 16
 
 type ProofOfWork struct {
 	Block  *Block
-	Target *big.Int
+	Target *[32]byte
 }
 
 func NewProofOfWork(b *Block) *ProofOfWork {
-	target := big.NewInt(1)
-	// todo
-	target.Lsh(target, uint(256-Difficulty))
-	return &ProofOfWork{b, target}
+	return &ProofOfWork{b, New32BytesArrWithRsh(Difficulty)}
 }
 
-func (pow *ProofOfWork) Fill(nonce int) []byte {
+func (pow *ProofOfWork) ToBytesWithNonce(nonce int) []byte {
 	return bytes.Join(
 		[][]byte{
 			pow.Block.PrevHash,
 			pow.Block.Data,
-			ToHex(int64(nonce)),
-			ToHex(int64(Difficulty)),
+			ToBytes(int64(nonce)),
+			ToBytes(int64(Difficulty)),
 		},
 		[]byte{},
 	)
 }
 
 func (pow *ProofOfWork) Run() (int, []byte) {
-	var intHash big.Int
-	var hash [32]byte
-
 	nonce := 0
+	var checksum [32]byte
 
 	for nonce < math.MaxInt64 {
 		// give it a try with nonce
-		data := pow.Fill(nonce)
-		hash = sha256.Sum256(data)
+		data := pow.ToBytesWithNonce(nonce)
+		checksum = sha256.Sum256(data)
 
-		fmt.Printf("\t%x\n", hash)
-		intHash.SetBytes(hash[:])
+		// todo: flush
+		fmt.Printf("\t%x\n", checksum)
 
-		// todo: abstract cmp
-		if intHash.Cmp(pow.Target) == -1 {
+		if Cmp32BytesArr(&checksum, pow.Target) == -1 {
 			break
 		} else {
 			nonce++
 		}
 	}
 
-	return nonce, hash[:]
+	return nonce, checksum[:]
 }
 
 func (pow *ProofOfWork) Validate() bool {
-	var intHash big.Int
-	data := pow.Fill(pow.Block.Nonce)
+	data := pow.ToBytesWithNonce(pow.Block.Nonce)
 	hash := sha256.Sum256(data)
-	intHash.SetBytes(hash[:])
-	return intHash.Cmp(pow.Target) == -1
-}
-
-func ToHex(num int64) []byte {
-	buff := new(bytes.Buffer)
-	err := binary.Write(buff, binary.BigEndian, num)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	return buff.Bytes()
+	return Cmp32BytesArr(&hash, pow.Target) == -1
 }
