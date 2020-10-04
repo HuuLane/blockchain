@@ -15,7 +15,7 @@ var (
 	singleton *BlockChain
 )
 
-func NewBlockChain() *BlockChain {
+func New() *BlockChain {
 	if singleton == nil {
 		var lastHash []byte
 
