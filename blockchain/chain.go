@@ -11,6 +11,13 @@ func (c *BlockChain) AddBlock(data string) {
 	c.Blocks = append(c.Blocks, nb)
 }
 
+var (
+	singleton *BlockChain
+)
+
 func NewBlockChain() *BlockChain {
-	return &BlockChain{[]*Block{Genesis()}}
+	if singleton == nil {
+		singleton = &BlockChain{[]*Block{Genesis()}}
+	}
+	return singleton
 }
