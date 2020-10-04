@@ -14,7 +14,7 @@ type Block struct {
 
 func NewBlock(prevHash []byte, data string) *Block {
 	b := &Block{prevHash, []byte(data), nil, 0}
-	pow := NewProofOfWork(b)
+	pow := NewProof(b)
 	nonce, checksum := pow.Run()
 
 	b.Nonce = nonce

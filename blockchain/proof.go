@@ -21,16 +21,16 @@ import (
 // must >= 1
 const Difficulty = 16
 
-type ProofOfWork struct {
+type Proof struct {
 	Block  *Block
 	Target *[32]byte
 }
 
-func NewProofOfWork(b *Block) *ProofOfWork {
-	return &ProofOfWork{b, New32BytesArrWithRsh(Difficulty)}
+func NewProof(b *Block) *Proof {
+	return &Proof{b, New32BytesArrWithRsh(Difficulty)}
 }
 
-func (pow *ProofOfWork) ToBytesWithNonce(nonce int) []byte {
+func (pow *Proof) ToBytesWithNonce(nonce int) []byte {
 	return bytes.Join(
 		[][]byte{
 			pow.Block.PrevHash,
@@ -42,7 +42,7 @@ func (pow *ProofOfWork) ToBytesWithNonce(nonce int) []byte {
 	)
 }
 
-func (pow *ProofOfWork) Run() (int, []byte) {
+func (pow *Proof) Run() (int, []byte) {
 	nonce := 0
 	var checksum [32]byte
 
@@ -64,7 +64,7 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 	return nonce, checksum[:]
 }
 
-func (pow *ProofOfWork) Validate() bool {
+func (pow *Proof) Validate() bool {
 	data := pow.ToBytesWithNonce(pow.Block.Nonce)
 	checksum := sha256.Sum256(data)
 	return Cmp32BytesArr(&checksum, pow.Target) == -1
