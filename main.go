@@ -14,13 +14,14 @@ func main() {
 	chain.AddBlock("Second Block after Genesis")
 	chain.AddBlock("Third Block after Genesis")
 
-	for _, block := range chain.Blocks {
+	iter := chain.Iterator()
+	for b := iter.Next(); b.PrevHash != nil; b = iter.Next() {
 
-		fmt.Printf("Previous Hash: %x\n", block.PrevHash)
-		fmt.Printf("Data in Block: %s\n", block.Data)
-		fmt.Printf("Hash: %x\n", block.Hash)
+		fmt.Printf("Previous Hash: %x\n", b.PrevHash)
+		fmt.Printf("Data in Block: %s\n", b.Data)
+		fmt.Printf("Hash: %x\n", b.Hash)
 
-		pow := blockchain.NewProofOfWork(block)
+		pow := blockchain.NewProofOfWork(b)
 		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
 		fmt.Println()
 

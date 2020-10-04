@@ -73,3 +73,31 @@ func (c *BlockChain) AddBlock(data string) {
 	})
 	Handle(err)
 }
+
+func (c *BlockChain) Iterator() *Iterator {
+	return &Iterator{c.LastHash, c.Database}
+}
+
+type Iterator struct {
+	CurrentHash []byte
+	Database    *badger.DB
+}
+
+func (iter *Iterator) Next() *Block {
+	var block *Block
+
+	err := iter.Database.View(func(txn *badger.Txn) error {
+		var encodedBlock []byte
+		item, err := txn.Get(iter.CurrentHash)
+		Handle(err)
+		encodedBlock, err = item.ValueCopy(encodedBlock)
+		block = Deserialize(encodedBlock)
+
+		return err
+	})
+	Handle(err)
+
+	iter.CurrentHash = block.PrevHash
+
+	return block
+}
