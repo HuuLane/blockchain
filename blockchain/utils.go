@@ -7,6 +7,12 @@ import (
 	"math/big"
 )
 
+func Handle(err error) {
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
 func New32BytesArrWithRsh(n int) *[32]byte {
 	if n < 1 || n > 32 {
 		panic("shift out of bounds")
