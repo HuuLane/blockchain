@@ -11,32 +11,6 @@ type BlockChain struct {
 	Database *badger.DB
 }
 
-func (c *BlockChain) AddBlock(data string) {
-	var lastHash []byte
-
-	err := c.Database.View(func(txn *badger.Txn) error {
-		item, err := txn.Get([]byte("lh"))
-		Handle(err)
-		lastHash, err = item.ValueCopy(lastHash)
-
-		return err
-	})
-	Handle(err)
-
-	newBlock := NewBlock(lastHash, data)
-
-	err = c.Database.Update(func(txn *badger.Txn) error {
-		err := txn.Set(newBlock.Hash, newBlock.Serialize())
-		Handle(err)
-		err = txn.Set([]byte("lh"), newBlock.Hash)
-
-		c.LastHash = newBlock.Hash
-
-		return err
-	})
-	Handle(err)
-}
-
 var (
 	singleton *BlockChain
 )
@@ -72,4 +46,30 @@ func NewBlockChain() *BlockChain {
 		singleton = &BlockChain{lastHash, db}
 	}
 	return singleton
+}
+
+func (c *BlockChain) AddBlock(data string) {
+	var lastHash []byte
+
+	err := c.Database.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte("lh"))
+		Handle(err)
+		lastHash, err = item.ValueCopy(lastHash)
+
+		return err
+	})
+	Handle(err)
+
+	newBlock := NewBlock(lastHash, data)
+
+	err = c.Database.Update(func(txn *badger.Txn) error {
+		err := txn.Set(newBlock.Hash, newBlock.Serialize())
+		Handle(err)
+		err = txn.Set([]byte("lh"), newBlock.Hash)
+
+		c.LastHash = newBlock.Hash
+
+		return err
+	})
+	Handle(err)
 }
