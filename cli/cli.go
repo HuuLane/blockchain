@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/HuuLane/blockchain/blockchain"
+	"github.com/HuuLane/stupidcoin/blockchain"
 )
 
 type CommandLine struct{}

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/HuuLane/blockchain/cli"
+	"github.com/HuuLane/stupidcoin/cli"
 )
 
 func main() {

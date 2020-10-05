@@ -1,4 +1,4 @@
-module github.com/HuuLane/blockchain
+module github.com/HuuLane/stupidcoin
 
 go 1.15
 
