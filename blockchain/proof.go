@@ -34,7 +34,7 @@ func (pow *Proof) ToBytesWithNonce(nonce int) []byte {
 	return bytes.Join(
 		[][]byte{
 			pow.Block.PrevHash,
-			pow.Block.Data,
+			pow.Block.TransactionsChecksum(),
 			ToBytes(int64(nonce)),
 			ToBytes(int64(Difficulty)),
 		},
