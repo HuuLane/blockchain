@@ -48,21 +48,6 @@ func NewTransaction(from, to string, amount int, chain *BlockChain) *Transaction
 	return &tx
 }
 
-// An input of tx is an output of a previous tx
-// So we need that tx id and that output index to trace the source of the money
-// Pubkey is the address of the payee, spend money Need to use sig to sign
-// but currently sig == pubkey
-type TxInput struct {
-	TxID     []byte // transaction ID
-	OutIndex int    // index of output
-	Sig      string //
-}
-
-type TxOutput struct {
-	Value  int
-	PubKey string
-}
-
 func (tx *Transaction) SetID() {
 	var encoded bytes.Buffer
 	var checksum [32]byte
@@ -91,12 +76,4 @@ func CoinbaseTx(to, data string) *Transaction {
 
 func (tx *Transaction) IsCoinbase() bool {
 	return len(tx.Inputs) == 1 && len(tx.Inputs[0].TxID) == 0 && tx.Inputs[0].OutIndex == -1
-}
-
-func (in *TxInput) CanUnlock(data string) bool {
-	return in.Sig == data
-}
-
-func (out *TxOutput) CanBeUnlocked(data string) bool {
-	return out.PubKey == data
 }
