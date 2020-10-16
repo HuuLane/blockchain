@@ -36,6 +36,7 @@ func (w Wallet) Address() []byte {
 }
 
 func ValidateAddress(address string) bool {
+	// todo trim this shit
 	fullHash := Base58Decode([]byte(address))
 	actualChecksum := fullHash[len(fullHash)-checksumLength:]
 	version := fullHash[0]
