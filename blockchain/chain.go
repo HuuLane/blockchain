@@ -126,10 +126,7 @@ func (c *BlockChain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 	STXOs := make(map[string]map[int]struct{})
 
 	iter := c.Iterator()
-
-	for {
-		block := iter.Next()
-
+	for block := iter.Next(); block != nil; block = iter.Next() {
 		for _, tx := range block.Transactions {
 			// 进钱在先, 花钱在后, 所以不用担心这种顺序
 			// todo: rename
@@ -164,9 +161,6 @@ func (c *BlockChain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 
 		}
 
-		if len(block.PrevHash) == 0 {
-			break
-		}
 	}
 
 	return unspentTxs
@@ -218,8 +212,12 @@ type Iterator struct {
 	Database    *badger.DB
 }
 
-// todo: using nil to terminal
+// From latest block to genesis
 func (iter *Iterator) Next() *Block {
+	if len(iter.CurrentHash) == 0 {
+		return nil
+	}
+
 	var block *Block
 
 	err := iter.Database.View(func(txn *badger.Txn) error {
@@ -240,18 +238,11 @@ func (iter *Iterator) Next() *Block {
 
 func (c *BlockChain) FindTransaction(ID []byte) (Transaction, error) {
 	iter := c.Iterator()
-
-	for {
-		block := iter.Next()
-
+	for block := iter.Next(); block != nil; block = iter.Next() {
 		for _, tx := range block.Transactions {
 			if bytes.Compare(tx.ID, ID) == 0 {
 				return *tx, nil
 			}
-		}
-
-		if len(block.PrevHash) == 0 {
-			break
 		}
 	}
 

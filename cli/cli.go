@@ -54,8 +54,7 @@ func (cli *CommandLine) printChain() {
 	defer chain.Database.Close()
 	iter := chain.Iterator()
 
-	for {
-		block := iter.Next()
+	for block := iter.Next(); block != nil; block = iter.Next() {
 
 		fmt.Printf("Prev. hash: %x\n", block.PrevHash)
 		fmt.Printf("Hash: %x\n", block.Hash)
@@ -63,9 +62,6 @@ func (cli *CommandLine) printChain() {
 		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
 		fmt.Println()
 
-		if len(block.PrevHash) == 0 {
-			break
-		}
 	}
 }
 
