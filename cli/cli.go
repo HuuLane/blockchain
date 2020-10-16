@@ -60,6 +60,9 @@ func (cli *CommandLine) printChain() {
 		fmt.Printf("Hash: %x\n", block.Hash)
 		pow := blockchain.NewProof(block)
 		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
+		for i, tx := range block.Transactions {
+			fmt.Printf("tx %d: %s", i, tx)
+		}
 		fmt.Println()
 
 	}

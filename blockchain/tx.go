@@ -50,7 +50,7 @@ func NewTransaction(from, to string, amount int, chain *BlockChain) *Transaction
 
 	// Return back the remaining money
 	if acc > amount {
-		outputs = append(outputs, TXOutput{acc - amount, w.PublicKey})
+		outputs = append(outputs, *NewTXOutput(acc-amount, from))
 	}
 
 	tx := Transaction{nil, inputs, outputs}
