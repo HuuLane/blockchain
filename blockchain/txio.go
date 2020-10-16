@@ -31,14 +31,14 @@ type TXOutput struct {
 
 func NewTXOutput(value int, address string) *TXOutput {
 	txo := &TXOutput{value, nil}
-	txo.Lock([]byte(address))
+	txo.Lock(address)
 
 	return txo
 }
 
-func (out *TXOutput) Lock(address []byte) {
-	decoded := wallet.Base58Decode(address)
-	out.PubKeyHash = decoded[1 : len(decoded)-4]
+func (out *TXOutput) Lock(address string) {
+	_, pubKeyHash, _ := wallet.ParseAddress(address)
+	out.PubKeyHash = pubKeyHash
 }
 
 func (out *TXOutput) IsLockedWithKey(pubKeyHash []byte) bool {

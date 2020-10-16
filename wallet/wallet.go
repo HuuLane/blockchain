@@ -35,15 +35,19 @@ func (w Wallet) Address() []byte {
 	return address
 }
 
-func ValidateAddress(address string) bool {
-	// todo trim this shit
+func ParseAddress(address string) (version byte, pubKeyHash, checksum []byte) {
 	fullHash := Base58Decode([]byte(address))
-	actualChecksum := fullHash[len(fullHash)-checksumLength:]
-	version := fullHash[0]
-	pubKeyHash := fullHash[1 : len(fullHash)-checksumLength]
-	targetChecksum := Checksum(append([]byte{version}, pubKeyHash...))
 
-	return bytes.Compare(actualChecksum, targetChecksum) == 0
+	version = fullHash[0]
+	pubKeyHash = fullHash[1 : len(fullHash)-checksumLength]
+	checksum = fullHash[len(fullHash)-checksumLength:]
+	return
+}
+
+func ValidateAddress(address string) bool {
+	version, pubKeyHash, checksum := ParseAddress(address)
+	calculatedChecksum := Checksum(append([]byte{version}, pubKeyHash...))
+	return bytes.Compare(checksum, calculatedChecksum) == 0
 }
 
 func New() *Wallet {

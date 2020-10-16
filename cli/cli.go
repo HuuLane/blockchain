@@ -87,8 +87,7 @@ func (cli *CommandLine) getBalance(address string) {
 	chain := blockchain.Continue()
 	defer chain.Database.Close()
 
-	pubKeyHash := wallet.Base58Decode([]byte(address))
-	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-4]
+	_, pubKeyHash, _ := wallet.ParseAddress(address)
 	UTXOs := chain.FindUTXO(pubKeyHash)
 
 	balance := 0
