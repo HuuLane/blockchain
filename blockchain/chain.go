@@ -119,11 +119,10 @@ func (c *BlockChain) Iterator() *Iterator {
 func (c *BlockChain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 	var unspentTxs []Transaction
 
-	// todo: refactor to set
 	// 记录这个 address 在某次 tx output 得到的钱, 已经花掉
 	// key: txID
 	// value: outIndex
-	STXOs := make(map[string]map[int]struct{})
+	STXOs := make(map[string]Set)
 
 	iter := c.Iterator()
 	for block := iter.Next(); block != nil; block = iter.Next() {
@@ -136,7 +135,7 @@ func (c *BlockChain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 				if STXOs[txID] != nil {
 					// It appeared in a transaction's inputs before
 					// indicating that it was spent
-					if _, ok := STXOs[txID][outIdx]; ok {
+					if STXOs[txID].Has(outIdx) {
 						continue
 					}
 				}
@@ -154,8 +153,8 @@ func (c *BlockChain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 				// Umm.. Yes
 				if in.IsUsedWithKey(pubKeyHash) {
 					txID := hex.EncodeToString(in.TxID)
-					STXOs[txID] = make(map[int]struct{})
-					STXOs[txID][in.OutIndex] = struct{}{}
+					STXOs[txID] = make(Set)
+					STXOs[txID].Add(in.OutIndex)
 				}
 			}
 

@@ -7,6 +7,23 @@ import (
 	"math/big"
 )
 
+type void struct{}
+
+type Set map[interface{}]void
+
+func (s Set) Add(item interface{}) {
+	s[item] = void{}
+}
+
+func (s Set) Delete(item interface{}) {
+	delete(s, item)
+}
+
+func (s Set) Has(item interface{}) bool {
+	_, ok := s[item]
+	return ok
+}
+
 func Handle(err error) {
 	if err != nil {
 		log.Panic(err)
